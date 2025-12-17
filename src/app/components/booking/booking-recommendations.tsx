@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarDays, MapPin } from "lucide-react";
-import { useEffect, useState } from "react";
+import { CalendarDays, MapPin, Loader2 } from "lucide-react";
+import { useState } from "react";
 import { format } from 'date-fns';
 import { useBooking } from "@/app/contexts/booking-context";
 
@@ -21,30 +21,30 @@ const mockBookingInput = {
 
 export function BookingRecommendations() {
     const [recommendation, setRecommendation] = useState<RecommendServiceOutput | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const { toast } = useToast();
     const { addBooking } = useBooking();
+    const [recommendationsFetched, setRecommendationsFetched] = useState(false);
 
-    useEffect(() => {
-        async function getRecommendation() {
-            try {
-                setLoading(true);
-                const result = await recommendService(mockBookingInput);
-                setRecommendation(result);
-            } catch (error) {
-                console.error("Error fetching booking recommendation:", error);
-                toast({
-                    title: "Error",
-                    description: "Could not fetch booking recommendations.",
-                    variant: "destructive"
-                });
-            } finally {
-                setLoading(false);
-            }
+
+    const getRecommendation = async () => {
+        try {
+            setLoading(true);
+            setRecommendationsFetched(true);
+            const result = await recommendService(mockBookingInput);
+            setRecommendation(result);
+        } catch (error) {
+            console.error("Error fetching booking recommendation:", error);
+            toast({
+                title: "Error",
+                description: "Could not fetch booking recommendations.",
+                variant: "destructive"
+            });
+        } finally {
+            setLoading(false);
         }
-        const timer = setTimeout(getRecommendation, 3000);
-        return () => clearTimeout(timer);
-    }, [toast]);
+    }
+
 
     const handleAccept = (timeSlot: string) => {
         addBooking(new Date(timeSlot));
@@ -59,6 +59,23 @@ export function BookingRecommendations() {
             title: "Let's find another time!",
             description: "Use the AI Assistant to find a different appointment slot.",
         });
+    }
+
+    if (!recommendationsFetched) {
+        return (
+            <Card className="max-w-2xl mx-auto">
+                <CardHeader>
+                    <CardTitle>Ready to Book?</CardTitle>
+                    <CardDescription>Click the button below to get AI-powered service recommendations.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button onClick={getRecommendation} disabled={loading}>
+                        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Find Recommendations
+                    </Button>
+                </CardContent>
+            </Card>
+        );
     }
 
     if (loading) {

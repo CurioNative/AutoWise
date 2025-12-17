@@ -17,7 +17,7 @@ interface Message {
 
 export function AiAssistant() {
   const [messages, setMessages] = useState<Message[]>([
-    { sender: 'ai', text: 'Hello! How can I help you with your vehicle today? You can ask questions or manage appointments (e.g., "schedule a service").' }
+    { sender: 'ai', text: 'Hello! How can I help you with your vehicle today? You can ask questions or manage appointments (e.g., "schedule a service for tomorrow at 2pm").' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -39,10 +39,11 @@ export function AiAssistant() {
 
     try {
       let responseText: string;
-      // Simple intent detection
-      if (input.toLowerCase().includes('schedule') || input.toLowerCase().includes('cancel') || input.toLowerCase().includes('reschedule')) {
-        const action = input.toLowerCase().includes('cancel') ? 'cancel' : input.toLowerCase().includes('reschedule') ? 'reschedule' : 'schedule';
-        const result = await manageServiceAppointment({ action, userQuery: input });
+      // Simple intent detection using keywords. A more robust solution could use a classification model.
+      const isAppointmentRelated = ['schedule', 'cancel', 'reschedule', 'book', 'appointment'].some(keyword => input.toLowerCase().includes(keyword));
+
+      if (isAppointmentRelated) {
+        const result = await manageServiceAppointment({ userQuery: input });
         responseText = result.confirmationMessage;
       } else {
         const result = await vehicleQuestionAnswering({ question: input });

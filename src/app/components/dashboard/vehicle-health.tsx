@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from '@/components/ui/skeleton';
 import { vehicleHealthExplanation, type VehicleHealthExplanationOutput } from '@/ai/flows/vehicle-health-explanation';
-import { Bot, Zap, Wrench } from 'lucide-react';
+import { Bot, Zap, Wrench, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const mockInput = {
   vehicleHealthScore: 85,
@@ -16,10 +17,12 @@ const mockInput = {
 
 export function VehicleHealth() {
   const [healthData, setHealthData] = useState<VehicleHealthExplanationOutput | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [explanationLoaded, setExplanationLoaded] = useState(false);
 
-  useEffect(() => {
-    async function getHealthData() {
+  const getHealthData = async () => {
+      setLoading(true);
+      setExplanationLoaded(true);
       try {
         const result = await vehicleHealthExplanation(mockInput);
         setHealthData(result);
@@ -29,9 +32,7 @@ export function VehicleHealth() {
         setLoading(false);
       }
     }
-    const timer = setTimeout(getHealthData, 4000);
-    return () => clearTimeout(timer);
-  }, []);
+
 
   return (
     <>
@@ -82,13 +83,19 @@ export function VehicleHealth() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {!explanationLoaded && (
+              <Button onClick={getHealthData} disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Get AI Explanation
+              </Button>
+            )}
             {loading && <Skeleton className="h-16 w-full" />}
-            {healthData && (
+            {explanationLoaded && !loading && healthData && (
                  <p className="text-sm text-muted-foreground whitespace-pre-wrap animate-in fade-in-0">
                     {healthData.explanation}
                 </p>
             )}
-            {!loading && !healthData && <p className="text-sm text-destructive">Could not load AI explanation at this time.</p>}
+            {explanationLoaded && !loading && !healthData && <p className="text-sm text-destructive">Could not load AI explanation at this time.</p>}
           </CardContent>
         </Card>
     </>
