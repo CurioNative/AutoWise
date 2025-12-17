@@ -19,6 +19,17 @@ export function PredictiveCalendar() {
     const [loading, setLoading] = useState(true);
     const [confidence, setConfidence] = useState(0);
 
+    const generateFallbackData = () => {
+        const today = new Date();
+        const dummyData = Array.from({ length: 14 }).map((_, i) => ({
+            date: format(addDays(today, i), 'd'),
+            dayOfWeek: format(addDays(today, i), 'EEE'),
+            workload: Math.floor(Math.random() * 80) + 20, // Random workload 20-100
+        }));
+        setCalendarData(dummyData);
+        setConfidence(0.5);
+    }
+
     useEffect(() => {
         async function getCalendar() {
             try {
@@ -29,19 +40,17 @@ export function PredictiveCalendar() {
                     daysAhead: 14,
                 });
                 const parsedData = JSON.parse(result.calendarData);
-                setCalendarData(parsedData.calendar);
-                setConfidence(result.confidenceLevel);
+                if(parsedData && parsedData.calendar) {
+                    setCalendarData(parsedData.calendar);
+                    setConfidence(result.confidenceLevel);
+                } else {
+                    // Fallback to dummy data if response is not in expected format
+                    generateFallbackData();
+                }
             } catch (error) {
                 console.error("Error fetching predictive calendar:", error);
                 // Fallback to dummy data on error
-                const today = new Date();
-                const dummyData = Array.from({ length: 14 }).map((_, i) => ({
-                    date: format(addDays(today, i), 'd'),
-                    dayOfWeek: format(addDays(today, i), 'EEE'),
-                    workload: Math.floor(Math.random() * 80) + 20, // Random workload 20-100
-                }));
-                setCalendarData(dummyData);
-                setConfidence(0.5);
+                generateFallbackData();
             } finally {
                 setLoading(false);
             }
@@ -71,7 +80,7 @@ export function PredictiveCalendar() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 text-center">
-                        {calendarData.map((day, index) => (
+                        {calendarData && calendarData.map((day, index) => (
                             <div key={index} className="border rounded-lg p-2 flex flex-col items-center justify-between aspect-[4/5] animate-in fade-in-0" style={{animationDelay: `${index*50}ms`}}>
                                 <div className="text-muted-foreground text-sm">{day.dayOfWeek}</div>
                                 <div className="font-bold text-3xl my-2">{day.date}</div>
