@@ -1,3 +1,4 @@
+'use server';
 import { config } from 'dotenv';
 config();
 
@@ -8,3 +9,4 @@ import '@/ai/flows/recurring-failure-analysis.ts';
 import '@/ai/flows/ai-service-recommendation.ts';
 import '@/ai/flows/service-booking-management.ts';
 import '@/ai/flows/predictive-failure-alert.ts';
+import '@/ai/flows/part-failure-prediction.ts';
