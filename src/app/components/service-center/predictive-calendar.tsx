@@ -5,19 +5,22 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { addDays, format } from "date-fns";
-import { useEffect, useState } from "react";
+import { addDays, format, isSameDay } from "date-fns";
+import { useEffect, useState, useMemo } from "react";
+import { useBooking } from "@/app/contexts/booking-context";
 
 interface CalendarDay {
     date: string;
     dayOfWeek: string;
     workload: number; // 0-100
+    isNewBooking?: boolean;
 }
 
 export function PredictiveCalendar() {
     const [calendarData, setCalendarData] = useState<CalendarDay[]>([]);
     const [loading, setLoading] = useState(true);
     const [confidence, setConfidence] = useState(0);
+    const { newBookings } = useBooking();
 
     const generateFallbackData = () => {
         const today = new Date();
@@ -44,12 +47,10 @@ export function PredictiveCalendar() {
                     setCalendarData(parsedData.calendar);
                     setConfidence(result.confidenceLevel);
                 } else {
-                    // Fallback to dummy data if response is not in expected format
                     generateFallbackData();
                 }
             } catch (error) {
                 console.error("Error fetching predictive calendar:", error);
-                // Fallback to dummy data on error
                 generateFallbackData();
             } finally {
                 setLoading(false);
@@ -58,7 +59,22 @@ export function PredictiveCalendar() {
         getCalendar();
     }, []);
 
-    const getWorkloadColor = (workload: number) => {
+    const processedCalendarData = useMemo(() => {
+        const today = new Date();
+        return calendarData.map(day => {
+            const dayDate = addDays(today, calendarData.indexOf(day));
+            const isNew = newBookings.some(bookingDate => isSameDay(bookingDate, dayDate));
+            return {
+                ...day,
+                workload: isNew ? Math.min(100, day.workload + 15) : day.workload,
+                isNewBooking: isNew,
+            };
+        });
+    }, [calendarData, newBookings]);
+
+
+    const getWorkloadColor = (workload: number, isNewBooking?: boolean) => {
+        if (isNewBooking) return 'bg-blue-500 hover:bg-blue-600 text-white border-transparent animate-pulse';
         if (workload > 85) return 'bg-red-500/80 hover:bg-red-500/90 text-white border-transparent';
         if (workload > 60) return 'bg-yellow-500/80 hover:bg-yellow-500/90 text-yellow-950 border-transparent';
         return 'bg-green-500/80 hover:bg-green-500/90 text-white border-transparent';
@@ -80,12 +96,12 @@ export function PredictiveCalendar() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 text-center">
-                        {calendarData && calendarData.map((day, index) => (
+                        {processedCalendarData.map((day, index) => (
                             <div key={index} className="border rounded-lg p-2 flex flex-col items-center justify-between aspect-[4/5] animate-in fade-in-0" style={{animationDelay: `${index*50}ms`}}>
                                 <div className="text-muted-foreground text-sm">{day.dayOfWeek}</div>
                                 <div className="font-bold text-3xl my-2">{day.date}</div>
-                                <Badge className={cn("text-xs transition-colors", getWorkloadColor(day.workload))}>
-                                    {day.workload}% Load
+                                <Badge className={cn("text-xs transition-colors", getWorkloadColor(day.workload, day.isNewBooking))}>
+                                    {day.isNewBooking && 'New! '}{day.workload}% Load
                                 </Badge>
                             </div>
                         ))}

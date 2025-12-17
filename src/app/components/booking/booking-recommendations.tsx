@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CalendarDays, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
 import { format } from 'date-fns';
+import { useBooking } from "@/app/contexts/booking-context";
 
 const mockBookingInput = {
     vehicleType: 'SUV',
@@ -22,6 +23,7 @@ export function BookingRecommendations() {
     const [recommendation, setRecommendation] = useState<RecommendServiceOutput | null>(null);
     const [loading, setLoading] = useState(true);
     const { toast } = useToast();
+    const { addBooking } = useBooking();
 
     useEffect(() => {
         async function getRecommendation() {
@@ -40,14 +42,15 @@ export function BookingRecommendations() {
                 setLoading(false);
             }
         }
-        const timer = setTimeout(getRecommendation, 2000);
+        const timer = setTimeout(getRecommendation, 3000);
         return () => clearTimeout(timer);
     }, [toast]);
 
     const handleAccept = (timeSlot: string) => {
+        addBooking(new Date(timeSlot));
         toast({
             title: "Appointment Booked!",
-            description: `Your service is confirmed for ${format(new Date(timeSlot), 'PPP p')}.`,
+            description: `Your service is confirmed for ${format(new Date(timeSlot), 'PPP p')}. The service center has been notified.`,
         });
     };
     

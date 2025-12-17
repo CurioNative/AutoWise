@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from './contexts/auth-context';
 import { AppLayout } from './components/app-layout';
+import { BookingProvider } from './contexts/booking-context';
 
 export const metadata: Metadata = {
   title: 'AutoWise',
@@ -24,9 +25,11 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <AuthProvider>
-          <AppLayout>
-            {children}
-          </AppLayout>
+          <BookingProvider>
+            <AppLayout>
+              {children}
+            </AppLayout>
+          </BookingProvider>
         </AuthProvider>
         <Toaster />
       </body>

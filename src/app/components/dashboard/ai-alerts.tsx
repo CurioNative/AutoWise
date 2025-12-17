@@ -4,7 +4,9 @@ import { predictFailureAlert, type PredictiveFailureAlertOutput } from '@/ai/flo
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldAlert, Wrench } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const mockAlertInput = {
     sensorData: '{"brake_fluid_level": "low", "brake_pad_wear": "85%"}',
@@ -47,9 +49,17 @@ export function AiAlerts() {
           <Alert variant="destructive" className="animate-in fade-in-0">
             <ShieldAlert />
             <AlertTitle>{alert.alertTitle} (Confidence: {Math.round(alert.confidenceLevel * 100)}%)</AlertTitle>
-            <AlertDescription className="mt-2 space-y-2">
+            <AlertDescription className="mt-2 space-y-4">
                 <p>{alert.explanation}</p>
-                <p><span className="font-semibold">Suggested Action:</span> {alert.suggestedAction}</p>
+                <div>
+                  <p className="font-semibold mb-2">Suggested Action: {alert.suggestedAction}</p>
+                  <Button asChild>
+                    <Link href="/booking">
+                      <Wrench className="mr-2" />
+                      Book Service Now
+                    </Link>
+                  </Button>
+                </div>
             </AlertDescription>
           </Alert>
         )}
