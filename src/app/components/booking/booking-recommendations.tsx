@@ -40,7 +40,7 @@ export function BookingRecommendations() {
                 setLoading(false);
             }
         }
-        const timer = setTimeout(getRecommendation, 1500);
+        const timer = setTimeout(getRecommendation, 2000);
         return () => clearTimeout(timer);
     }, [toast]);
 
