@@ -29,7 +29,7 @@ export function VehicleHealth() {
         setLoading(false);
       }
     }
-    const timer = setTimeout(getHealthData, 2000);
+    const timer = setTimeout(getHealthData, 4000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -88,7 +88,7 @@ export function VehicleHealth() {
                     {healthData.explanation}
                 </p>
             )}
-            {!loading && !healthData && <p className="text-sm text-destructive">Could not load AI explanation.</p>}
+            {!loading && !healthData && <p className="text-sm text-destructive">Could not load AI explanation at this time.</p>}
           </CardContent>
         </Card>
     </>

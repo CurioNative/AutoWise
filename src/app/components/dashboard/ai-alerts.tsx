@@ -26,13 +26,14 @@ export function AiAlerts() {
         const result = await predictFailureAlert(mockAlertInput);
         setAlert(result);
       } catch (error) {
+        // Silently fail for MVP, console log for debugging
         console.error("Error fetching AI alerts:", error);
       } finally {
         setLoading(false);
       }
     }
     // Add a delay for demonstration purposes
-    const timer = setTimeout(getAlerts, 1000);
+    const timer = setTimeout(getAlerts, 1500);
     return () => clearTimeout(timer);
   }, []);
 

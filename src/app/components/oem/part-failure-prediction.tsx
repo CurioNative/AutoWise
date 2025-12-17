@@ -3,7 +3,7 @@
 import { predictPartFailures, type PartFailurePredictionOutput } from "@/ai/flows/part-failure-prediction";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell, LabelList } from "recharts";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -78,6 +78,7 @@ export function PartFailurePrediction() {
                                         <FormItem>
                                             <FormLabel>Vehicle Make</FormLabel>
                                             <FormControl><Input {...field} /></FormControl>
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
@@ -88,6 +89,7 @@ export function PartFailurePrediction() {
                                         <FormItem>
                                             <FormLabel>Vehicle Model</FormLabel>
                                             <FormControl><Input {...field} /></FormControl>
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
@@ -98,6 +100,7 @@ export function PartFailurePrediction() {
                                         <FormItem>
                                             <FormLabel>Year</FormLabel>
                                             <FormControl><Input type="number" {...field} /></FormControl>
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
@@ -128,10 +131,10 @@ export function PartFailurePrediction() {
                         {prediction && (
                             <div className="space-y-4 animate-in fade-in-0">
                                 <ResponsiveContainer width="100%" height={300}>
-                                    <BarChart data={prediction.predictions} layout="vertical" margin={{ left: 20 }}>
+                                    <BarChart data={prediction.predictions} layout="vertical" margin={{ left: 20, right: 30 }}>
                                         <CartesianGrid strokeDasharray="3 3" />
                                         <XAxis type="number" domain={[0, 1]} tickFormatter={(tick) => `${tick * 100}%`} />
-                                        <YAxis type="category" dataKey="partName" width={120} />
+                                        <YAxis type="category" dataKey="partName" width={120} tick={{fontSize: 12}} />
                                         <Tooltip 
                                             formatter={(value: number) => [`${(value * 100).toFixed(1)}%`, 'Probability']}
                                             labelStyle={{ fontWeight: 'bold' }}
@@ -143,6 +146,7 @@ export function PartFailurePrediction() {
                                         />
                                         <Legend />
                                         <Bar dataKey="failureProbability" name="Failure Probability">
+                                            <LabelList dataKey="failureProbability" position="right" formatter={(value: number) => `${(value * 100).toFixed(0)}%`} fontSize={12} />
                                             {prediction.predictions.map((entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={getBarColor(entry.failureProbability)} />
                                             ))}
