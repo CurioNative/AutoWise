@@ -21,7 +21,6 @@ export function VehicleHealth() {
   useEffect(() => {
     async function getHealthData() {
       try {
-        setLoading(true);
         const result = await vehicleHealthExplanation(mockInput);
         setHealthData(result);
       } catch (error) {
@@ -30,19 +29,9 @@ export function VehicleHealth() {
         setLoading(false);
       }
     }
-    getHealthData();
+    const timer = setTimeout(getHealthData, 2000);
+    return () => clearTimeout(timer);
   }, []);
-
-  if (loading) {
-    return (
-      <>
-        <Card><CardHeader><Skeleton className="h-6 w-1/2" /></CardHeader><CardContent><Skeleton className="h-16 w-full" /></CardContent></Card>
-        <Card><CardHeader><Skeleton className="h-6 w-1/2" /></CardHeader><CardContent><Skeleton className="h-16 w-full" /></CardContent></Card>
-        <Card><CardHeader><Skeleton className="h-6 w-1/2" /></CardHeader><CardContent><Skeleton className="h-16 w-full" /></CardContent></Card>
-        <Card className="col-span-1 md:col-span-2 lg:col-span-3"><CardHeader><Skeleton className="h-6 w-1/3" /></CardHeader><CardContent><Skeleton className="h-20 w-full" /></CardContent></Card>
-      </>
-    );
-  }
 
   return (
     <>
@@ -82,7 +71,6 @@ export function VehicleHealth() {
           <p className="text-xs text-muted-foreground">Upcoming maintenance</p>
         </CardContent>
       </Card>
-      {healthData && (
         <Card className="md:col-span-2 lg:col-span-3">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -94,12 +82,15 @@ export function VehicleHealth() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-              {healthData.explanation}
-            </p>
+            {loading && <Skeleton className="h-16 w-full" />}
+            {healthData && (
+                 <p className="text-sm text-muted-foreground whitespace-pre-wrap animate-in fade-in-0">
+                    {healthData.explanation}
+                </p>
+            )}
+            {!loading && !healthData && <p className="text-sm text-destructive">Could not load AI explanation.</p>}
           </CardContent>
         </Card>
-      )}
     </>
   );
 }
