@@ -86,7 +86,8 @@ export function FailureAnalysis() {
                             </Card>
                             <Card className="animate-in fade-in-0" style={{animationDelay: '100ms'}}><CardHeader><CardTitle>Potential Component Defects</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{analysis.componentDefects}</p></CardContent></Card>
                             <Card className="animate-in fade-in-0" style={{animationDelay: '200ms'}}><CardHeader><CardTitle>Root Cause Analysis</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{analysis.rootCauseAnalysis}</p></CardContent></Card>
-                            <Card className="animate-in fade-in-0" style={{animationDelay: '300ms'}}><CardHeader><CardTitle>Failure Clusters</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{analysis.failureClusters}</p></CardContent></Card>
+                            <Card className="animate-in fade-in-0" style={{animationDelay: '300ms'}}><CardHeader><CardTitle>Corrective & Preventive Actions (CAPA)</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground whitespace-pre-wrap">{analysis.capaRecommendations}</p></CardContent></Card>
+                            <Card className="animate-in fade-in-0" style={{animationDelay: '400ms'}}><CardHeader><CardTitle>Failure Clusters</CardTitle></CardHeader><CardContent><p className="text-sm text-muted-foreground">{analysis.failureClusters}</p></CardContent></Card>
                         </>
                     )}
                 </div>

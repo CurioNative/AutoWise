@@ -44,6 +44,11 @@ const RecurringFailureAnalysisOutputSchema = z.object({
     .describe(
       'Root cause analysis of the identified failure patterns, including potential causes and contributing factors.'
     ),
+  capaRecommendations: z
+    .string()
+    .describe(
+      'Suggested Corrective and Preventive Actions (CAPA) based on the root cause analysis. This should be a list of actionable steps for engineers.'
+    ),
   failureClusters: z
     .string()
     .describe(
@@ -64,9 +69,9 @@ const prompt = ai.definePrompt({
   name: 'recurringFailureAnalysisPrompt',
   input: {schema: RecurringFailureAnalysisInputSchema},
   output: {schema: RecurringFailureAnalysisOutputSchema},
-  prompt: `You are an expert reliability engineer specializing in identifying recurring failure patterns in vehicles.
+  prompt: `You are an expert reliability engineer specializing in identifying recurring failure patterns in vehicles and recommending solutions.
 
-You will analyze sensor data, failure context, and component type to identify recurring failure patterns, potential component defects, perform root cause analysis, and cluster failures.
+You will analyze sensor data, failure context, and component type to identify recurring failure patterns, potential component defects, perform root cause analysis, cluster failures, and recommend corrective actions.
 
 Use the following information to conduct the analysis:
 
@@ -74,9 +79,14 @@ Sensor Data: {{{sensorData}}}
 Failure Context: {{{failureContext}}}
 Component Type: {{{componentType}}}
 
-Based on this information, identify recurring failure patterns, component defects, root causes, and failure clusters. Provide detailed explanations for each.
+Based on this information, provide:
+- Recurring failure patterns.
+- Potential component defects.
+- A detailed root cause analysis.
+- Suggested Corrective and Preventive Actions (CAPA) to address the root causes. These recommendations should be actionable for engineers.
+- Failure clusters.
 
-Output in JSON format with 'failurePatterns', 'componentDefects', 'rootCauseAnalysis', and 'failureClusters' fields:
+Output in JSON format with 'failurePatterns', 'componentDefects', 'rootCauseAnalysis', 'capaRecommendations', and 'failureClusters' fields:
 `,
 });
 
