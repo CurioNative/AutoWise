@@ -112,6 +112,8 @@ Coordinates the complete lifecycle and assigns tasks to worker agents.
 | Database (Demo)              | Mock JSON / In-memory                 |
 | Charts & Visualization       | Chart.js / Recharts                   |
 
+This MVP has been developed for demo purposes using the Gemini 3.1 LLM to power the AI/ML and agentic framework.
+
 ---
 
 ## 📂 Project Structure
